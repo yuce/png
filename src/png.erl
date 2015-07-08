@@ -4,6 +4,8 @@
 
 -include_lib("png/include/png.hrl").
 
+-define(SCANLINE_FILTER, 0).
+
 
 header() ->
     <<16#89, 16#50, 16#4E, 16#47, 16#0D, 16#0A, 16#1A, 16#0A>>.
@@ -27,7 +29,8 @@ chunk('IHDR', #png_config{width = Width,
     chunk(<<"IHDR">>, Data);
 
 chunk('IDAT', {rows, Rows}) ->
-    Raw = list_to_binary([[0, Row] || Row <- Rows]),
+    % We don't currently support any scanline filters (other than None)
+    Raw = list_to_binary([[?SCANLINE_FILTER, Row] || Row <- Rows]),
     chunk('IDAT', {raw, Raw});
 
 chunk('IDAT', {raw, Data}) ->
