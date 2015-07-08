@@ -84,19 +84,25 @@ header_test() ->
     Result = chunk('IHDR', #png_config{width = 32,
                                      height = 16,
                                      bit_depth = 8,
-                                     color_type = ?PNG_RGB}),
+                                     color_type = ?PNG_COLOR_RGB}),
     Target = <<0,0,0,13,73,72,68,82,0,0,0,32,0,0,0,16,8,2,0,0,0,248,98,234,14>>,
     ?assertEqual(Target, Result).
 
 compressed_IDAT_test() ->
     Data = <<0, 1, 2, 3>>,
     Result = chunk('IDAT', {compressed, Data}),
-    Target = Data,
-    ?assertEqual(Target, Data).
+    Target = <<0,0,0,4,73,68,65,84,0,1,2,3,64,222,190,8>>,
+    ?assertEqual(Target, Result).
 
 raw_IDAT_test() ->
     Data = <<0, 1, 2, 3>>,
     Result = chunk('IDAT', {raw, Data}),
+    Target = <<0,0,0,12,73,68,65,84,120,156,99,96,100,98,6,0,0,14,0,7,215,111,228,120>>,
+    ?assertEqual(Target, Result).
+
+rows_IDAT_test() ->
+    Data = [<<1, 2, 3>>],
+    Result = chunk('IDAT', {rows, Data}),
     Target = <<0,0,0,12,73,68,65,84,120,156,99,96,100,98,6,0,0,14,0,7,215,111,228,120>>,
     ?assertEqual(Target, Result).
 
