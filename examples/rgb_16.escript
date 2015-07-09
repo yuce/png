@@ -31,10 +31,8 @@ make_rows(Width, Height) ->
 
 make_row(Y, Width, Height) ->
     F = fun(X) ->
-              get_color(X, Y, Width, Height) end,
-    list_to_binary(for(F, 1, Width)).
+            R = trunc(X / Width * 65535),
+            B = trunc(Y / Height * 65535),
+            <<R:16, 32768:16, B:16>> end,
+    for(F, 1, Width).
 
-get_color(X, Y, Width, Height) ->
-    R = trunc(X / Width * 65535),
-    B = trunc(Y / Height * 65535),
-    <<R:16, 32768:16, B:16>>.
