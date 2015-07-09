@@ -36,14 +36,18 @@ chunk('IDAT', {rows, Rows}) ->
 chunk('IDAT', {raw, Data}) ->
     chunk('IDAT', {compressed, compress(Data)});
 
-chunk('IDAT', {compressed, CompressedData}) ->
-    chunk(<<"IDAT">>, CompressedData);
+chunk('IDAT', {compressed, CompressedData}) when is_list(CompressedData) ->
+    F = fun(Part) ->
+        chunk(<<"IDAT">>, Part) end,
+    lists:map(F, CompressedData);
+    % chunk(<<"IDAT">>, CompressedData);
 
 chunk('PLTE', {rgb, BitDepth, ColorTuples}) ->
     L = [<<R:BitDepth, G:BitDepth, B:BitDepth>> || {R, G, B} <- ColorTuples],
     chunk(<<"PLTE">>, list_to_binary(L));
 
-chunk(Type, Data) when is_binary(Type), is_binary(Data) ->
+chunk(Type, Data) when is_binary(Type),
+                       is_binary(Data) ->
     Length = byte_size(Data),
     TypeData = <<Type/binary, Data/binary>>,
     Crc = erlang:crc32(TypeData),
@@ -53,13 +57,15 @@ chunk('IEND') ->
     chunk(<<"IEND">>, <<>>).
 
 
+-spec compress(binary()) -> binary().
 compress(Data) ->
     Z = zlib:open(),
-    zlib:deflateInit(Z),
-    B2 = zlib:deflate(Z, Data, finish),
-    zlib:deflateEnd(Z),
-    zlib:close(Z),
-    list_to_binary(B2).
+    ok = zlib:deflateInit(Z),
+    Compressed = zlib:deflate(Z, Data, finish),
+    ok = zlib:deflateEnd(Z),
+    ok = zlib:close(Z),
+    Compressed.
+    % list_to_binary(Compressed).
 
 
 -ifdef(TEST).
@@ -92,21 +98,21 @@ header_test() ->
     ?assertEqual(Target, Result).
 
 compressed_IDAT_test() ->
-    Data = <<0, 1, 2, 3>>,
+    Data = [<<0, 1, 2, 3>>],
     Result = chunk('IDAT', {compressed, Data}),
-    Target = <<0,0,0,4,73,68,65,84,0,1,2,3,64,222,190,8>>,
+    Target = [<<0,0,0,4,73,68,65,84,0,1,2,3,64,222,190,8>>],
     ?assertEqual(Target, Result).
 
 raw_IDAT_test() ->
     Data = <<0, 1, 2, 3>>,
     Result = chunk('IDAT', {raw, Data}),
-    Target = <<0,0,0,12,73,68,65,84,120,156,99,96,100,98,6,0,0,14,0,7,215,111,228,120>>,
+    Target = [<<0,0,0,12,73,68,65,84,120,156,99,96,100,98,6,0,0,14,0,7,215,111,228,120>>],
     ?assertEqual(Target, Result).
 
 rows_IDAT_test() ->
     Data = [<<1, 2, 3>>],
     Result = chunk('IDAT', {rows, Data}),
-    Target = <<0,0,0,12,73,68,65,84,120,156,99,96,100,98,6,0,0,14,0,7,215,111,228,120>>,
+    Target = [<<0,0,0,12,73,68,65,84,120,156,99,96,100,98,6,0,0,14,0,7,215,111,228,120>>],
     ?assertEqual(Target, Result).
 
 'PLTE_test'() ->
