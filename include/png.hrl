@@ -7,7 +7,7 @@
 
 -record(png_config, {width = 0,
                height = 0,
-               bit_depth = 1,
+               bit_depth = 8,
                color_type = 0,
                compression_method = 0,
                filter_method = 0,
