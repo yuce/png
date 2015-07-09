@@ -15,16 +15,13 @@ main([]) ->
     Height = 50,
     Rows = make_rows(Width, Height, Pallette),
     Data = {rows, Rows},
-    PngConfig = #png_config{width = Width,
-                            height = Height,
-                            bit_depth = BitDepth,
-                            color_type = ?PNG_COLOR_INDEXED},
+    PngConfig = #png_config{size = {Width, Height},
+                            mode = {indexed, 8}},
     IoData = [png:header(),
               png:chunk('IHDR', PngConfig),
               png:chunk('PLTE', Pallette),
               png:chunk('IDAT', Data),
               png:chunk('IEND')],
-    io:format("Module: ~p~n", [?MODULE]),
     ok = file:write_file("indexed_8.png", IoData).
 
 

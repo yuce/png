@@ -7,15 +7,12 @@
 
 
 main([]) ->
-    BitDepth = 16,
     Width = 100,
     Height = 100,
     Rows = make_rows(Width, Height),
     Data = {rows, Rows},
-    PngConfig = #png_config{width = Width,
-                            height = Height,
-                            bit_depth = BitDepth,
-                            color_type = ?PNG_COLOR_RGB},
+    PngConfig = #png_config{size = {Width, Height},
+                            mode = {rgb, 16}},
     IoData = [png:header(),
               png:chunk('IHDR', PngConfig),
               png:chunk('IDAT', Data),

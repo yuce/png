@@ -1,14 +1,16 @@
 
--define(PNG_COLOR_GRAYSCALE, 0).
--define(PNG_COLOR_RGB, 2).
--define(PNG_COLOR_INDEXED, 3).
--define(PNG_COLOR_GRAYSCALE_ALPHA, 4).
--define(PNG_COLOR_RGBA, 6).
+-define(PNG_INDEXED_8, {indexed, 8}).
+-define(PNG_GRAYSCALE_8, {grayscale, 8}).
+-define(PNG_GRAYSCALE_16, {grayscale, 16}).
+-define(PNG_GRAYSCALE_ALPHA_8, {grayscale_alpha, 8}).
+-define(PNG_GRAYSCALE_ALPHA_16, {grayscale_alpha, 16}).
+-define(PNG_RGB_8, {rgb, 8}).
+-define(PNG_RGB_16, {rgb, 16}).
+-define(PNG_RGBA_8, {rgba, 8}).
+-define(PNG_RGBA_16, {rgba, 16}).
 
--record(png_config, {width = 0,
-                     height = 0,
-                     bit_depth = 8,
-                     color_type = 0,
+-record(png_config, {size = {0, 0},
+                     mode = ?PNG_GRAYSCALE_8,
                      compression_method = 0,
                      filter_method = 0,
                      interlace_method = 0}).
