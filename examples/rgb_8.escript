@@ -2,30 +2,27 @@
 %% -*- erlang -*-
 %%! -pa ../_build/default/lib/png/ebin
 
--include("../_build/default/lib/png/include/png.hrl").
--include("common.hrl").
-
-
 main([]) ->
     Width = 100,
     Height = 100,
-    PngConfig = #png_config{size = {Width, Height},
-                            mode = {rgb, 8}},
-    IoData = [png:header(),
-              png:chunk('IHDR', PngConfig),
-              png:chunk('IDAT', {rows, make_rows(Width, Height)}),
-              png:chunk('IEND')],
-    ok = file:write_file("rgb_8.png", IoData).
+    {ok, File} = file:open("rgb_8.png", [write]),
+    % create an 8bit rgb img
+    Png = png:create(#{size => {Width, Height},
+                       mode => {rgb, 8},
+                       file => File}),
+    ok = append_rows(Png),
+    ok = png:close(Png),
+    ok = file:close(File).
 
+append_rows(#{size := {_, Height}} = Png) ->
+    F = fun(Y) ->
+            append_row(Png, Y) end,
+    lists:foreach(F, lists:seq(1, Height)).
 
-make_rows(Width, Height) ->
-    F = fun(Y, Rows) ->
-            [make_row(Y, Width, Height) | Rows] end,
-    lists:reverse(lists:foldl(F, [], lists:seq(1, Height))).
-
-make_row(Y, Width, Height) ->
+append_row(#{size := {Width, Height}} = Png, Y) ->
     F = fun(X) ->
             R = trunc(X / Width * 255),
             B = trunc(Y / Height * 255),
             <<R, 128, B>> end,
-    for(F, 1, Width).
+    Row = lists:map(F, lists:seq(1, Width)),
+    png:append(Png, {row, Row}).

@@ -2,46 +2,34 @@
 %% -*- erlang -*-
 %%! -pa ../_build/default/lib/png/ebin
 
--include("../_build/default/lib/png/include/png.hrl").
--include("common.hrl").
-
--define(THICKNESS, 10).
-
-
 main([]) ->
-    BitDepth = 8,
-    Pallette = {rgb, BitDepth, [{255, 0, 0}, {0, 255, 0}, {0, 0, 255}]},
-    Width = 50,
-    Height = 50,
-    Rows = make_rows(Width, Height, Pallette),
-    Data = {rows, Rows},
-    PngConfig = #png_config{size = {Width, Height},
-                            mode = {indexed, 8}},
-    IoData = [png:header(),
-              png:chunk('IHDR', PngConfig),
-              png:chunk('PLTE', Pallette),
-              png:chunk('IDAT', Data),
-              png:chunk('IEND')],
-    ok = file:write_file("indexed_8.png", IoData).
+    Width = 100,
+    Height = 100,
+    Palette = {rgb, 8, [{255, 0, 0}, {0, 255, 0}, {0, 0, 255}]},
+    Callback = fun(Bin) ->
+                    io:format("Wrote: ~p~n", [Bin]) end,
+    Png = png:create(#{size => {Width, Height},
+                       mode => {indexed, 8},
+                       call => Callback,
+                       palette => Palette}),
+    ok = append_rows(Png),
+    ok = png:close(Png),
+    ok.
 
 
-make_rows(Width, Height, {rgb, _, Colors}) ->
-    ColorCount = length(Colors),
-    F = fun(Y) ->
-            make_row(Width, Y, ColorCount, 2) end,
-    for(F, 1, Height).
+append_rows(Png) ->
+    append_row(Png, 0).
 
-make_row(Width, Y, ColorCount, _PixSize) ->
-    F = fun(X) ->
-            get_color_index(X, Y, ColorCount) end,
-    list_to_binary(for(F, 1, Width)).
 
-get_color_index(X, Y, _ColorCount) when X > (Y + ?THICKNESS) ->
-    2;
+append_row(#{size := {_, Height}}, Height) ->
+    ok;
 
-get_color_index(X, Y, _ColorCount) when (X + ?THICKNESS) < Y ->
-    1;
-
-get_color_index(_X, _Y, _ColorCount) ->
-    0.
-
+append_row(#{size := {Width, _Height}} = Png, Y) ->
+    Thickness = Width div 4,
+    F = fun
+            (X) when X > (Y + Thickness) -> 2;
+            (X) when (X + Thickness) < Y -> 1;
+            (_) -> 0 end,
+    Row = lists:map(F, lists:seq(1, Width)),
+    png:append(Png, {row, Row}),
+    append_row(Png, Y + 1).
