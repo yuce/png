@@ -39,14 +39,14 @@ append_palette(#{}) ->
 
 
 append(Png, {row, Row}) ->
-    append(Png, {raw, [0, Row]});
+    append(Png, {data, [0, Row]});
 
 append(Png, {rows, Rows}) ->
     F = fun(Row) ->
         [0, Row] end,
-    append(Png, {raw, lists:map(F, Rows)});
+    append(Png, {data, lists:map(F, Rows)});
 
-append(#{z := Z} = Png, {raw, RawData}) ->
+append(#{z := Z} = Png, {data, RawData}) ->
     Compressed = zlib:deflate(Z, RawData),
     append(Png, {compressed, Compressed}),
     Png;
