@@ -1,11 +1,71 @@
 -module(png).
 
+-export([create/1, append/2, close/1]).
 -export([check_config/1]).
 -export([header/0, chunk/1, chunk/2]).
 
 -include_lib("png/include/png.hrl").
 
 -define(SCANLINE_FILTER, 0).
+
+
+create(#{file := File} = Png) ->
+    Callback = fun(Data) ->
+                    file:write(File, Data) end,
+    Png2 = maps:remove(file, Png#{call => Callback}),
+    create(Png2);
+
+create(#{size := {Width, Height} = Size,
+         mode := Mode,
+         call := Callback} = Png) ->
+    Config = #png_config{size = {Width, Height},
+                         mode = Mode},
+    ok = Callback(header()),
+    ok = Callback(chunk('IHDR', Config)),
+    ok = append_palette(Png),
+    Z = zlib:open(),
+    ok = zlib:deflateInit(Z),
+    #{size => Size,
+      mode => Mode,
+      call => Callback,
+      z => Z}.
+
+append_palette(#{call := Callback, palette := Palette}) ->
+    Chunk = chunk('PLTE', Palette),
+    ok = Callback(Chunk);
+
+append_palette(#{}) ->
+    ok.
+
+
+append(Png, {row, Row}) ->
+    append(Png, {raw, [0, Row]});
+
+append(Png, {rows, Rows}) ->
+    F = fun(Row) ->
+        [0, Row] end,
+    append(Png, {raw, lists:map(F, Rows)});
+
+append(#{z := Z} = Png, {raw, RawData}) ->
+    Compressed = zlib:deflate(Z, RawData),
+    append(Png, {compressed, Compressed}),
+    Png;
+
+append(Png, {compressed, []}) ->
+    Png;
+
+append(#{call := Callback} = Png, {compressed, Compressed}) ->
+    Chunks = chunk('IDAT', {compressed, Compressed}),
+    ok = Callback(Chunks),
+    Png.
+
+close(#{z := Z, call := Callback} = Png) ->
+    Compressed = zlib:deflate(Z, <<>>, finish),
+    append(Png, {compressed, Compressed}),
+    ok = zlib:deflateEnd(Z),
+    ok = zlib:close(Z),
+    ok = Callback(chunk('IEND')),
+    ok.
 
 
 valid_mode({ColorType, _}) when ColorType /= grayscale,
