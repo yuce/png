@@ -1,26 +1,8 @@
-png
-=====
+#! /usr/bin/env escript
+%% -*- erlang -*-
+%%! -pa ../_build/default/lib/png/ebin
 
-**png** is a pure Erlang library for creating PNG images. It can currently create *8* and *16* bit *RGB*, *RGB with alpha*, *indexed*, *grayscale* and *grayscale with alpha* images.
-
-Install (Erlang)
-----------------
-
-**png** requires at least Erlang 17.0, since it uses maps.
-
-Include the library in your *rebar* configuration:
-
-    {deps, [
-        {png, ".*", {git, "https://github.com/yuce/png.git", "master"}}]}.
-
-Alternatively, for *rebar 3*:
-
-    {deps, [png]}.
-
-
-Taster
-------
-
+main([]) ->
     random:seed(erlang:now()),
     Width = 30,
     Height = 30,
@@ -44,5 +26,3 @@ Taster
     % need to "close" the image
     ok = png:close(Png),
     ok = file:close(File).
-
-See the examples for more.
