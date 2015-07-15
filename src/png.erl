@@ -9,6 +9,8 @@
 -define(SCANLINE_FILTER, 0).
 
 
+-spec create(map()) -> map().
+
 create(#{file := File} = Png) ->
     Callback = fun(Data) ->
                     file:write(File, Data) end,
@@ -38,6 +40,8 @@ append_palette(#{}) ->
     ok.
 
 
+-spec append(map(), {row, iodata()} | {rows, iodata()} | {data, iodata()} | {compressed, iodata()}) -> map().
+
 append(Png, {row, Row}) ->
     append(Png, {data, [0, Row]});
 
@@ -58,6 +62,9 @@ append(#{call := Callback} = Png, {compressed, Compressed}) ->
     Chunks = chunk('IDAT', {compressed, Compressed}),
     ok = Callback(Chunks),
     Png.
+
+
+-spec close(map()) -> ok.
 
 close(#{z := Z, call := Callback} = Png) ->
     Compressed = zlib:deflate(Z, <<>>, finish),
@@ -162,7 +169,7 @@ chunk('IEND') ->
     chunk(<<"IEND">>, <<>>).
 
 
--spec compress(binary()) -> binary().
+-spec compress(binary()) -> [binary()].
 compress(Data) ->
     Z = zlib:open(),
     ok = zlib:deflateInit(Z),
