@@ -40,7 +40,8 @@ append_palette(#{}) ->
     ok.
 
 
--spec append(map(), {row, iodata()} | {rows, iodata()} | {data, iodata()} | {compressed, iodata()}) -> map().
+-spec append(map(), {row, iodata()} | {rows, iodata()} | {data, iodata()} |
+                    {compressed, iodata()}) -> map().
 
 append(Png, {row, Row}) ->
     append(Png, {data, [0, Row]});
