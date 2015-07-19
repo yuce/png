@@ -95,16 +95,16 @@ The representation of a pixel depends on the *color mode* and *bits*. Here's a s
 
 Color Mode Name  | Color Mode        | Bits | Representation
 ------------------|-------------------|------|---------------
-Grayscale         | `grayscale`       |   8  | <<L:8>>
-Grayscale + Alpha | `grayscale_alpha` |   8  | <<L:8, A:8>>
-Indexed           | `indexed`         |   8  | <<I:8>>
-RGB               | `rgb`             |   8  | <<R:8, G:8, B:8>>
-RGB + Alpha       | `rgba`            |   8  | <<R:8, G:8, B:8, A:8>>
-Grayscale         | `grayscale`       |  16  | <<L:16>>
-Grayscale + Alpha | `grayscale_alpha` |  16  | <<L:16, A:16>>
-Indexed           | `indexed`         |  16  | <<I:16>>
-RGB               | `rgb`             |  16  | <<R:16, G:16, B:16>>
-RGB + Alpha       | `rgba`            |  16  | <<R:16, G:16, B:16, A:16>>
+Grayscale         | `grayscale`       |   8  | `<<L:8>>`
+Grayscale + Alpha | `grayscale_alpha` |   8  | `<<L:8, A:8>>`
+Indexed           | `indexed`         |   8  | `<<I:8>>`
+RGB               | `rgb`             |   8  | `<<R:8, G:8, B:8>>`
+RGB + Alpha       | `rgba`            |   8  | `<<R:8, G:8, B:8, A:8>>`
+Grayscale         | `grayscale`       |  16  | `<<L:16>>`
+Grayscale + Alpha | `grayscale_alpha` |  16  | `<<L:16, A:16>>`
+Indexed           | `indexed`         |  16  | `<<I:16>>`
+RGB               | `rgb`             |  16  | `<<R:16, G:16, B:16>>`
+RGB + Alpha       | `rgba`            |  16  | `<<R:16, G:16, B:16, A:16>>`
 
 Where, `L` is the luminance, `A` is alpha (*opacity*), `I` is the palette index, `R`, `G` and `B` are red, green and blue respectively.
 
