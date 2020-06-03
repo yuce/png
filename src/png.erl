@@ -152,7 +152,7 @@ chunk('IDAT', {raw, Data}) ->
 
 chunk('IDAT', {compressed, CompressedData}) when is_list(CompressedData) ->
     F = fun(Part) ->
-        chunk(<<"IDAT">>, Part) end,
+        chunk(<<"IDAT">>, iolist_to_binary(Part)) end,
     lists:map(F, CompressedData);
 
 chunk('PLTE', {rgb, BitDepth, ColorTuples}) ->
