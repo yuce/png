@@ -10,12 +10,16 @@ Install (Erlang)
 
 Include the library in your *rebar* configuration:
 
-    {deps, [
-        {png, ".*", {git, "https://github.com/yuce/png.git", "master"}}]}.
+```erlang
+{deps, [
+    {png, ".*", {git, "https://github.com/yuce/png.git", "master"}}]}.
+```
 
 Alternatively, for *rebar 3*:
 
-    {deps, [png]}.
+```erlang
+{deps, [png]}.
+```
 
 
 Taster
